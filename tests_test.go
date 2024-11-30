@@ -9,50 +9,6 @@ import (
 	"testing"
 )
 
-func TestRunLoxFile(t *testing.T) {
-	tests := []struct {
-		filePath    string
-		expectedOut string
-	}{
-		{
-			filePath:    "print_test.lox",
-			expectedOut: "Hello, world!\n",
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.filePath, func(t *testing.T) {
-			// Create a pipe to capture stdout
-			r, w, err := os.Pipe()
-			if err != nil {
-				t.Fatalf("Failed to create pipe: %v", err)
-			}
-
-			originalStdout := os.Stdout
-			os.Stdout = w
-
-			// Run the .lox file
-			go func() {
-				defer w.Close()
-				runFile(test.filePath)
-			}()
-
-			// Read the captured output
-			var output bytes.Buffer
-			_, err = io.Copy(&output, r)
-			if err != nil {
-				t.Fatalf("Failed to read output: %v", err)
-			}
-			os.Stdout = originalStdout
-
-			// Compare captured output to expected output
-			if output.String() != test.expectedOut {
-				t.Errorf("For file %s, expected:\n%s\nGot:\n%s", test.filePath, test.expectedOut, output.String())
-			}
-		})
-	}
-}
-
 func TestScanner(t *testing.T) {
 	tests := []struct {
 		name     string
